@@ -5,7 +5,6 @@ class Weather extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: this.props.name || 'london',
             weather: {},
         };
     }
@@ -14,44 +13,46 @@ class Weather extends React.Component {
         this.getWeather();
     }
 
-    getWeather = (cityName) => {
-        const city = cityName || this.state.name;
+    componentDidUpdate(prevProps) {
+        if (prevProps.cityName !== this.props.cityName) {
+            this.getWeather();
+        }
+    }
+
+    getWeather = () => {
+        const city = this.props.cityName || 'london';
         const WEATHER_API_KEY = '';
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${WEATHER_API_KEY}`;
         axios.get(url).then((res) => {
             console.log(res);
             if (res.status === 200) {
                 const weather = res.data;
-                this.setState({ name: city, weather });
+                this.setState({ weather });
             }
         });
-    };
-
-    setWeather = () => {
-        const temp = this.state.weather.main.temp;
-        return this.checktemp(temp);
     };
 
     checktemp = (temp) => {
         if (temp < 10) {
             return 'Freezing';
         }
-        if (temp >= 10 && temp < 24) {
+        if (temp >= 10 && temp < 18) {
             return 'Cloudy';
         }
-        if (temp >= 24) {
+        if (temp >= 18) {
             return 'Sunny';
         }
     };
 
     render() {
-        const { name, weather } = this.state;
+        const { weather } = this.state;
         if (weather.main) {
             return (
                 <>
-                    <h1>City :{name} , Country: {weather.sys.country}</h1>
-                    <div>Temperature is {weather.main.temp}</div>
-                    <div>Feels like {weather.main.feels_like}</div>
+                    <h1>City :{weather.name} , Country: {weather.sys.country}</h1>
+                    <div>The temperature is {weather.main.temp}</div>
+                    <div>But it feels like {weather.main.feels_like}</div>
+                    <div>It's a {this.checktemp(weather.main.temp)} day</div>
                 </>
             );
         }
