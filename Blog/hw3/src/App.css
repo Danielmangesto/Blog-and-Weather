@@ -49,3 +49,30 @@ nav li {
   display: inline-block;
   margin-right: 10px;
 }
+
+.container {
+  display: flex;
+}
+
+.posts {
+  flex: 1;
+}
+
+.sidebar {
+  flex: 0 0 300px;
+  margin-left: 50px;
+}
+
+.latest, .popular {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.latest {
+  background-color: #f7f7f7;
+}
+
+.popular {
+  background-color: #f2f2f2;
+}

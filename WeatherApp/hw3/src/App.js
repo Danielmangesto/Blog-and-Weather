@@ -5,12 +5,14 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            searchQuery: 'london',
+            searchQuery: '',
+            city: 'london',
         };
     }
 
     handleSubmit = (event) => {
         event.preventDefault();
+        this.setState({ city: this.state.searchQuery });
     };
 
     handleInputChange = (event) => {
@@ -31,7 +33,7 @@ class App extends React.Component {
                     />
                     <button type="submit">Go</button>
                 </form>
-                <Weather cityName={this.state.searchQuery} />
+                <Weather cityName={this.state.city} />
             </div>
         );
     }
