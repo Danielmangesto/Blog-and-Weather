@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Blog from "./Blog";
+import React from 'react';
 
 const posts = [
     { id: 1, title: 'Blog post #1', content: 'My first blog post is all about my blog post and how to write a new post in my blog, you can find it here.', published: '2023-04-27', author: 'Daniel' },
@@ -11,7 +9,17 @@ const posts = [
 function PostPage() {
     return (
         <div>
-            <Blog />
+            <div className="posts">
+                {posts.map((post) => (
+                    <div className="post" key={post.id}>
+                        <h2>{post.title}</h2>
+                        <p>{post.content}</p>
+                        <br />
+                        <br />
+                        <p>Published 1 day ago by Daniel</p>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

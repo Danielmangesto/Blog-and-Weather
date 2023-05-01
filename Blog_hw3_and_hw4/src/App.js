@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.css';
-import Blog from './Blog';
 import PostPage from "./PostPage";
 import Home from "./Home";
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import AboutMe from "./AboutMe";
 import NewPost from "./NewPost";
+import Login from "./Login"
 
 
 function App() {
@@ -20,6 +20,7 @@ function App() {
                     <li><Link to="/AboutMe">About me</Link></li>
                     <li><Link to="/NewPost">New Post</Link></li>
                     <li><Link to="/Posts">Post Page</Link></li>
+                    <li><Link to="/Login">Login Page</Link></li>
                 </ul>
             </nav>
             <div className="container">
@@ -28,6 +29,7 @@ function App() {
                     <Route path='/AboutMe' element={<AboutMe/>} />
                     <Route path='/NewPost' element={<NewPost/>} />
                     <Route path='/Posts' element={<PostPage />} />
+                    <Route path='/Login' element={<Login />} />
                 </Routes>
 
             </div>
