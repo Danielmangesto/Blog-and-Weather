@@ -50,29 +50,67 @@ nav li {
   margin-right: 10px;
 }
 
-.container {
+
+form {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
-.posts {
-  flex: 1;
+label {
+  display: block;
+  margin-bottom: 0.5rem;
 }
+
+input,
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
 
 .sidebar {
   flex: 0 0 300px;
   margin-left: 50px;
 }
 
+.latest {
+  background-color: #f7f7f7;
+}
+
+.sidebar {
+  flex: 1;
+  margin-right: 50px;
+}
+
 .latest, .popular {
   border: 1px solid #ccc;
   padding: 10px;
-  margin-bottom: 20px;
 }
 
 .latest {
   background-color: #f7f7f7;
 }
 
-.popular {
-  background-color: #f2f2f2;
-}
+
+
+
+
+
+
+
