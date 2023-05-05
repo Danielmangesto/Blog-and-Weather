@@ -16,7 +16,7 @@ function App() {
             </header>
             <nav>
                 <ul>
-                    <li><Link to="/Home">Home</Link></li>
+                    <li><Link to="/">Home</Link></li>
                     <li><Link to="/AboutMe">About me</Link></li>
                     <li><Link to="/NewPost">New Post</Link></li>
                     <li><Link to="/Posts">Post Page</Link></li>
@@ -25,10 +25,11 @@ function App() {
             </nav>
             <div className="container">
                 <Routes>
-                    <Route path='/Home' element={<Home />} />
+                    <Route path='/' element={<Home />} />
                     <Route path='/AboutMe' element={<AboutMe/>} />
                     <Route path='/NewPost' element={<NewPost/>} />
-                    <Route path='/Posts' element={<PostPage />} />
+                    <Route path='/Posts' element={<PostPage/>} />
+                    <Route path='/Posts/:id' element={<PostPage />} />
                     <Route path='/Login' element={<Login />} />
                 </Routes>
 
