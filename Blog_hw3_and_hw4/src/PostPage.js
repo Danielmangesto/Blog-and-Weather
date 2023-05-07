@@ -13,13 +13,12 @@ function PostPage() {
     if((id> posts.length)|| id === undefined){
         post = posts.find((post) => post.id === parseInt(1))
     }
-    console.log(post)
     return (
         <div>
             <div className="posts">
                     <div className="post" key={post.id}>
-                        <h2>{post.id}</h2>
-                        <p>{post.content}</p>
+                        <h2>Post number: {post.id}</h2>
+                        <p><br></br> {post.content}</p>
                         <br />
                         <br />
                         <p>Published 1 day ago by Daniel</p>

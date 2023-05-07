@@ -2,27 +2,17 @@ import React from 'react';
 import './App.css';
 import PostPage from "./PostPage";
 import Home from "./Home";
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import AboutMe from "./AboutMe";
 import NewPost from "./NewPost";
 import Login from "./Login"
+import Toolbar from "./Toolbar";
 
-//Done with hw5
 function App() {
     return (
         <Router>
-            <header>
-                <h1>This is my blog</h1>
-            </header>
-            <nav>
-                <ul>
-                    <li><Link to="/">Home</Link></li>
-                    <li><Link to="/AboutMe">About me</Link></li>
-                    <li><Link to="/NewPost">New Post</Link></li>
-                    <li><Link to="/Posts">Post Page</Link></li>
-                    <li><Link to="/Login">Login Page</Link></li>
-                </ul>
-            </nav>
+            <meta name="viewport" content="initial-scale=1, width=device-width" />
+            <Toolbar/>
             <div className="container">
                 <Routes>
                     <Route path='/' element={<Home />} />
@@ -32,9 +22,9 @@ function App() {
                     <Route path='/Posts/:id' element={<PostPage />} />
                     <Route path='/Login' element={<Login />} />
                 </Routes>
-
             </div>
         </Router>
+
     );
 }
 

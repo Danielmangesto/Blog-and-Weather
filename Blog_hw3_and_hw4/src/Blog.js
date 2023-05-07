@@ -1,4 +1,6 @@
 import React from 'react';
+import {useNavigate} from "react-router-dom";
+
 
 const posts = [
     { id: 1, title: 'Blog post #1', content: 'My first blog post is all about my blog post and how to write a new post in my blog, you can find it here.' },
@@ -7,12 +9,13 @@ const posts = [
 ];
 
 function Blog() {
+    const navigate = useNavigate();
     return (
         <div className="container">
             <div className="posts">
                 {posts.map((post) => (
                     <div className="post" key={post.id}>
-                        <h2>{post.title}</h2>
+                        <h2><a href="" onClick={()=> navigate(`Posts/${post.id}`)}>{post.title}</a></h2>
                         <p>{post.content}</p>
                         <br />
                         <br />
@@ -26,7 +29,7 @@ function Blog() {
                     <ul>
                         {posts.map((post) => (
                             <li key={post.id}>
-                                <a href="#">{post.title}</a>
+                                <a href="" onClick={()=> navigate(`Posts/${post.id}`)}>{post.title}</a>
                             </li>
                         ))}
                     </ul>
@@ -36,7 +39,7 @@ function Blog() {
                     <ul>
                         {posts.map((post) => (
                             <li key={post.id}>
-                                <a href="#">{post.title}</a>
+                                <a href="" onClick={()=> navigate(`Posts/${post.id}`)}>{post.title}</a>
                             </li>
                         ))}
                     </ul>
