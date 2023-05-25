@@ -64,7 +64,7 @@ def get_post(id):
     cursor.execute(query, values)
     record = cursor.fetchone()
     cursor.close()
-    header = ['id', 'title', 'image_id', 'body', 'user_id', 'publish_at']
+    header = ['id', 'title', 'image_id', 'body', 'user_id', 'published']
     record = list(record)
     record[5] = record[5].strftime('%Y-%m-%d %H:%M:%S')
     return json.dumps(dict(zip(header, record)))
