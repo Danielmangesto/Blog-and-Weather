@@ -31,20 +31,17 @@ function NewPost() {
     }
   };
 
-const handleImageUpload = () => {
-  if (postData.image === null) {
+  const handleImageUpload = () => {
     fileInputRef.current.click();
-  }
-};
+  };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-const handleSubmit = (e) => {
-  e.preventDefault();
-
-  if (!postData.title) {
-    alert('Title is required');
-  }
-
+    if (!postData.title) {
+      alert('Title is required');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('title', postData.title);

@@ -7,22 +7,11 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 const BlogCard = (props) => {
-  const { id, title, content, image_path, published } = props;
+  const { id, title, content, image, published } = props;
 
   return (
     <Card sx={{ maxWidth: 345 }}>
-      <CardMedia
-          sx={{ height: 140 }}
-          id={id}
-          title={title}
-          published={published}
-      />
-        <CardMedia
-        component="img"
-        alt="Blog Image"
-        height="140"
-        image={image_path}
-      />
+      <CardMedia sx={{ height: 140 }} id={id} image={image} title={title} published={published} />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {title}
