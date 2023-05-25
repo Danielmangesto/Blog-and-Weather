@@ -6,11 +6,7 @@ import axios from 'axios';
 function Blog() {
   const [posts, setPosts] = useState([]);
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  const fetchPosts = async () => {
+  const getdata = async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/Posts');
       setPosts(response.data);
@@ -19,14 +15,22 @@ function Blog() {
     }
   };
 
+  useEffect(() => {
+    getdata();
+  }, []);
+
   const PostList = ({ posts }) => {
+    if (!posts || posts.length === 0) {
+      return <p>No posts available.</p>;
+    }
+
     const list = posts.map((item) => (
       <BlogCard
         id={item.id}
         title={item.title}
         content={item.body}
-        image={item.image_id}
-        published={item.publish_at}
+        image_path={item.image_path}
+        published={item.published_at}
       />
     ));
     return <>{list}</>;
@@ -35,6 +39,7 @@ function Blog() {
   return (
     <Stack direction="row" spacing={1}>
       <PostList posts={posts} />
+      {console.log(posts)}
     </Stack>
   );
 }
