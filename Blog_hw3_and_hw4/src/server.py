@@ -63,7 +63,7 @@ def get_post(id):
     cursor = db.cursor()
     cursor.execute(query, values)
     record = cursor.fetchone()
-    cursor.close()  # Close the cursor after consuming the result set
+    cursor.close()
     header = ['id', 'title', 'image_id', 'body', 'user_id', 'publish_at']
     record = list(record)
     record[5] = record[5].strftime('%Y-%m-%d %H:%M:%S')
@@ -87,7 +87,7 @@ def add_post():
         image.save(filepath)
 
         api_url = 'https://api.imgbb.com/1/upload'
-        api_key = imgbb_api_key  # Replace with your actual client API key
+        api_key = imgbb_api_key
 
         response = requests.post(api_url, params={'expiration': 600, 'key': api_key}, files={'image': open(filepath, 'rb')})
         response_data = response.json()
