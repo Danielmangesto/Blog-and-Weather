@@ -7,6 +7,7 @@ import NewPost from './NewPost';
 import Login from './Login';
 import Toolbar from './Toolbar';
 import AccountPage from './AccountPage';
+import SignUp from "./SignUp";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/AboutMe" element={<AboutMe />} />
           <Route path="/NewPost" element={<NewPost />} />
           <Route path="/Login" element={<Login />} />
+          <Route path="/SignUp" element={<SignUp/>}/>
           <Route path="/Account" element={<AccountPage />} />
         </Routes>
       </div>
