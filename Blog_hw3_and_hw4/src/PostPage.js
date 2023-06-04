@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import BlogCard from "./BlogCard";
+import {Stack} from "@mui/material";
 
 
 function PostPage() {
@@ -8,8 +10,11 @@ function PostPage() {
   const [post, setPost] = useState(null);
 
   useEffect(() => {
-    // Fetch the post data from the server
-    axios.get(`http://127.0.0.1:5000/Posts/${id}`)
+    let Postid = id;
+    if (!Postid){
+      Postid = 1;
+    }
+    axios.get(`http://127.0.0.1:5000/Posts/${Postid}`)
       .then(response => {
         setPost(response.data);
       })
@@ -22,18 +27,27 @@ function PostPage() {
     return <div>Loading...</div>;
   }
 
+    const PostList = ({ posts }) => {
+    if (!posts || posts.length === 0) {
+      return <p>No posts available.</p>;
+    }
+
+    const list = posts.map((item) => (
+      <BlogCard
+        id={item.id}
+        title={item.title}
+        content={item.body}
+        image_path={item.image_path}
+        published={item.published_at}
+      />
+    ));
+    return <>{list}</>;
+  };
+
   return (
-    <div>
-      <div className="posts">
-        <div className="post" key={post.id}>
-          <h2>Post number: {post.id}</h2>
-          <p><br></br>{post.body}</p>
-          <br/>
-          <br/>
-          <p>Published {post.publish_at} by {post.user_id}</p>
-        </div>
-      </div>
-    </div>
+    <Stack direction="row" spacing={1}>
+      <PostList posts={[post]} />
+    </Stack>
   );
 }
 
