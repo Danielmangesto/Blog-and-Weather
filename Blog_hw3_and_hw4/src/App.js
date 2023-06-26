@@ -8,12 +8,15 @@ import Login from './Login';
 import Toolbar from './Toolbar';
 import AccountPage from './AccountPage';
 import SignUp from "./SignUp";
+import {AppBar, Switch} from "@mui/material";
 
 function App() {
   return (
     <Router>
       <div className="App">
+        <AppBar>
         <Toolbar />
+          </AppBar>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/AboutMe" element={<AboutMe />} />

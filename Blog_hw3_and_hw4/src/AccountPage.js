@@ -19,6 +19,7 @@ export default function AccountPage() {
 
   const fetchUserProfile = async (sessionKey) => {
     try {
+      console.log('112')
       const response = await fetch('http://127.0.0.1:5000/GetUserProfile', {
         headers: {
           Authorization: `Bearer ${sessionKey}`,
@@ -38,8 +39,6 @@ export default function AccountPage() {
   };
 
   const handleLogout = () => {
-    // Clear the session cookie or perform any other logout-related actions
-    document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     navigate('/Login'); // Redirect to the login page
   };
 

@@ -1,45 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import BlogCard from "./BlogCard";
-import {Stack} from "@mui/material";
+import BlogCard from './BlogCard';
 import axios from 'axios';
+import {Container, Grid} from "@mui/material";
+import Box from "@mui/material/Box";
 
 function Blog() {
   const [posts, setPosts] = useState([]);
 
-  const getdata = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:5000/Posts');
-      setPosts(response.data);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    }
-  };
+const getData = async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:5000/Posts/', {
+      withCredentials: true,
+    });
+    setPosts(response.data);
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+  }
+};
 
   useEffect(() => {
-    getdata();
+    getData();
   }, []);
 
-  const PostList = ({ posts }) => {
-    if (!posts || posts.length === 0) {
-      return <p>No posts available.</p>;
-    }
-
-    const list = posts.map((item) => (
-        <BlogCard
-          id={item.id}
-          title={item.title}
-          content={item.body}
-          image_path={item.image_path}
-          published={item.published_at}
-        />
-    ));
-    return <>{list}</>;
-  };
 
   return (
-    <Stack direction="row" spacing={1}>
-      <PostList posts={posts} />
-    </Stack>
+    <Grid item xs={4} sx={{ m: 5 }} align = "center">
+      {posts.map((post) => (
+        <BlogCard xs={3} align="center"
+          key={post.id}
+          id={post.id}
+          title={post.title}
+          content={post.body}
+          image_path={post.image_path}
+          published={post.published_at}
+        />
+      ))}
+    </Grid>
   );
 }
 

@@ -35,8 +35,6 @@ export default function Login() {
     if (sessionKey) {
       navigate('/Account');
     }
-
-    checkUserProfile();
   }, []);
 
   const getSessionIdFromCookie = () => {
@@ -54,7 +52,7 @@ export default function Login() {
     }));
   };
 
-  const doLogin = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
 
     const url = "http://127.0.0.1:5000/Login";
@@ -66,6 +64,7 @@ export default function Login() {
     axios.post(url, data, { withCredentials: true })
       .then((res) => {
         if (res.status === 200) {
+          refresh()
           navigate('/Account');
         } else {
           setUserData((prevData) => ({
@@ -82,35 +81,14 @@ export default function Login() {
       });
   };
 
-  const checkUserProfile = () => {
-    fetch("http://127.0.0.1:5000/GetUserProfile", {
-      credentials: "include"
-    })
-      .then((response) => {
-        if (response.status === 200) {
-          navigate('/Account');
-        } else {
-          setUserData((prevData) => ({
-            ...prevData,
-            resp: "Error!"
-          }));
-        }
-      })
-      .catch((err) => {
-        setUserData((prevData) => ({
-          ...prevData,
-          resp: "Error!"
-        }));
-      });
-  };
-
+  const refresh = () => window.location.reload(true)
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
+            marginTop:20,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -152,7 +130,7 @@ export default function Login() {
             <Button
               type="submit"
               fullWidth
-              onClick={doLogin}
+              onClick={handleLogin}
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >

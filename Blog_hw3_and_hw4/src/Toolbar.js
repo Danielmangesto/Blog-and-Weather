@@ -9,19 +9,24 @@ export default function ButtonAppBar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkUserLogin = async () => {
-      const response = await fetch("http://127.0.0.1:5000/GetUserProfile", {
-        credentials: "include",
-      });
+    if (!user) {
+      const checkUserLogin = async () => {
+        const response = await fetch("http://127.0.0.1:5000/GetUserProfile", {
+          credentials: "include",
+        });
 
-      if (response.status === 200) {
-        const data = await response.json();
-        setUser(data.username);
+        if (response.status === 200) {
+          const data = await response.json();
+          setUser(data.username);
         }
-    };
+        if (response.status === 401) {
+          setUser(null);
+        }
 
-    checkUserLogin();
-  }, [navigate]);
+      };
+      checkUserLogin();
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     const response = await fetch("http://127.0.0.1:5000/Logout", {
@@ -29,50 +34,49 @@ export default function ButtonAppBar() {
       credentials: "include",
     });
 
-    if (response.ok) {
+    if (response.status === 200 || response.status === 401) {
       setUser(null);
       navigate("/Login");
     }
   };
 
+
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          ></IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Button color="inherit" component={Link} to={"/"}>
-              Home
+      <Toolbar>
+        <IconButton
+          size="large"
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 2 }}
+        ></IconButton>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Button color="inherit" component={Link} to={"/"}>
+            Home
+          </Button>
+          <Button color="inherit"  component={Link} to={"/AboutMe"}>
+            About me
+          </Button>
+          <Button color="inherit"  component={Link} to={"/NewPost"}>
+            New Post
+          </Button>
+        </Typography>
+        {user ? (
+          <>
+            <Button color="inherit" component={Link} to={"/Account"}>
+              {user}
             </Button>
-            <Button color="inherit" component={Link} to={"/AboutMe"}>
-              About me
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
             </Button>
-            <Button color="inherit" component={Link} to={"/NewPost"}>
-              New Post
-            </Button>
-          </Typography>
-          {user ? (
-            <>
-              <Button color="inherit" component={Link} to={"/Account"}>
-                {user}
-              </Button>
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
-              </Button>
-            </>
-          ) : (
-            <Button color="inherit" component={Link} to={"/Login"}>
-              Login
-            </Button>
-          )}
-        </Toolbar>
-      </AppBar>
+          </>
+        ) : (
+          <Button color="inherit" component={Link} to={"/Login"}>
+            Login
+          </Button>
+        )}
+      </Toolbar>
     </Box>
   );
 }

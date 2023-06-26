@@ -1,2 +1,6 @@
 dbpwd = ''
-imgbb_api_key = ''
+db_end_point = ''
+local_db_endpoint= ''
+aws_access_key_id =''
+aws_secret_access_key = ''
+bucket_name = ''

@@ -33,7 +33,7 @@ function SignUp() {
       country_code: countryCode,
     };
 
-    const url = "http://127.0.0.1:5000/SignUp";
+    const url = "/SignUp";
     axios.post(url, requestData)
       .then((res) => {
       })
