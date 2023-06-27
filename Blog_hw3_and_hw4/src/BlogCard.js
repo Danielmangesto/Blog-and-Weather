@@ -29,7 +29,6 @@ const BlogCard = (props) => {
   }, []);
 
   const handleCommentSubmit = (commentData) => {
-    // handle comment submission
   };
 
   return (

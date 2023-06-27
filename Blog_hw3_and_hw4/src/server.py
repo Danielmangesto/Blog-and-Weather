@@ -455,7 +455,6 @@ def get_all_comments(id):
 
         return jsonify(data)
     else:
-        # Handle invalid post ID
         return jsonify(error='Invalid post ID')
 
 

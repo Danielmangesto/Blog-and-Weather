@@ -22,12 +22,15 @@ const CommentForm = ({ postId, onSubmit }) => {
       setCommentData((prevData) => ({
         ...prevData,
         comment: '',
-      }));
+      }
+      ));
+      refresh();
     } catch (error) {
       console.error('Error adding new comment:', error);
     }
   };
 
+  const refresh = () => window.location.reload(true)
   const handleChange = (event) => {
     const { name, value } = event.target;
     setCommentData((prevData) => ({
