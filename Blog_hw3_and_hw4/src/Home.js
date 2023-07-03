@@ -46,7 +46,6 @@ export default function Home() {
   const [user, setUser] = useState(null);
 
   const handleLogout = async () => {
-    // Perform logout actions and update the user state if needed
     setUser(null);
   };
 

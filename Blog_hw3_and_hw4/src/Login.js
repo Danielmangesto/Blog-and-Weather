@@ -24,8 +24,13 @@ export default function Login() {
   const [postData, setUserData] = useState({
     data: [],
     resp: null,
-    username: null,
-    password: null
+    username: "",
+    password: ""
+  });
+
+  const [validationError, setValidationError] = useState({
+    username: "",
+    password: ""
   });
 
   const navigate = useNavigate();
@@ -55,7 +60,11 @@ export default function Login() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    const url = "http://127.0.0.1:5000/Login";
+    if (!validateInputs()) {
+      return;
+    }
+
+    const url = "/Login";
     const data = {
       user: postData.username,
       pass: postData.password
@@ -64,7 +73,7 @@ export default function Login() {
     axios.post(url, data, { withCredentials: true })
       .then((res) => {
         if (res.status === 200) {
-          refresh()
+          refresh();
           navigate('/Account');
         } else {
           setUserData((prevData) => ({
@@ -81,14 +90,47 @@ export default function Login() {
       });
   };
 
-  const refresh = () => window.location.reload(true)
+  const validateInputs = () => {
+    let isValid = true;
+
+    if (postData.username.trim() === "") {
+      setValidationError((prevState) => ({
+        ...prevState,
+        username: "Username is required"
+      }));
+      isValid = false;
+    } else {
+      setValidationError((prevState) => ({
+        ...prevState,
+        username: ""
+      }));
+    }
+
+    if (postData.password.trim() === "") {
+      setValidationError((prevState) => ({
+        ...prevState,
+        password: "Password is required"
+      }));
+      isValid = false;
+    } else {
+      setValidationError((prevState) => ({
+        ...prevState,
+        password: ""
+      }));
+    }
+
+    return isValid;
+  };
+
+  const refresh = () => window.location.reload(true);
+
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{
-            marginTop:20,
+            marginTop: 20,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -110,6 +152,8 @@ export default function Login() {
               onChange={handleInputChange}
               autoComplete="username"
               autoFocus
+              error={Boolean(validationError.username)}
+              helperText={validationError.username}
             />
             <TextField
               margin="normal"
@@ -122,6 +166,8 @@ export default function Login() {
               onChange={handleInputChange}
               id="password"
               autoComplete="current-password"
+              error={Boolean(validationError.password)}
+              helperText={validationError.password}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}

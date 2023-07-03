@@ -18,22 +18,21 @@ app = Flask(__name__,
             static_folder='/home/ubuntu/build',
             static_url_path='/')
 
-CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:5000"],
-     expose_headers='Set-Cookie')
+CORS(app)
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
 pool = mysql.connector.pooling.MySQLConnectionPool(
-    host=local_db_endpoint,
-    user="root",
+    host=db_end_point,
+    user="admin",
     passwd=dbpwd,
     database="app",
     buffered=True,
     pool_size=5,
     pool_name='database'
 )
-
-
+@app.route('/SignUp')
+@app.route('/Login')
 @app.route('/Account')
 @app.route('/AboutMe')
 @app.route('/NewPost')
@@ -98,9 +97,7 @@ def get_user_profile():
             "session_id",
             value='',
             expires='Thu, 01 Jan 1970 00:00:00 GMT',
-            path="/",
-            samesite='None',
-            secure=True
+            path="/"
         )
         resp.status_code = 401
         return resp
@@ -175,9 +172,8 @@ def SignUp():
         "session_id",
         value=session_id,
         expires=datetime.now() + timedelta(hours=2),
-        path="/",
-        samesite='None',
-        secure=True
+        path="/"
+
     )
     return resp
 
@@ -221,7 +217,7 @@ def login():
         db.commit()
         cursor.close()
 
-    if not session_id:
+    if not session_id[0]:
         flag = 1
         query = "INSERT INTO session (id, session_id,expiration_time) VALUES (%s, %s,%s)"
         session_id = str(uuid.uuid4())
@@ -241,9 +237,8 @@ def login():
         "session_id",
         value=session_id,
         expires=datetime.now() + timedelta(hours=2),
-        path="/",
-        samesite='None',
-        secure=True
+        path="/"
+
     )
     return resp
 
@@ -263,8 +258,7 @@ def logout():
     db.close()
 
     resp = make_response(jsonify({'message': 'Logout successful.'}))
-    resp.delete_cookie("session_id",
-                       samesite='None'
+    resp.delete_cookie("session_id"
                        )
     return resp
 
@@ -299,7 +293,7 @@ def get_all_posts():
     return json.dumps(data, default=str)
 
 
-@app.route('/Posts/<int:id>', methods=['GET'])
+@app.route('/get_post/<int:id>', methods=['GET'])
 def get_post(id):
     db = pool.get_connection()
     query = "SELECT p.id, p.title, p.image_id, p.body, p.user_id, p.publish_at FROM posts p LEFT JOIN images i ON i.image = i.id WHERE p.id = %s"
@@ -307,6 +301,7 @@ def get_post(id):
     cursor = db.cursor()
     cursor.execute(query, values)
     record = cursor.fetchone()
+    print(record)
     cursor.close()
     db.close()
     header = ['id', 'title', 'image_id', 'body', 'user_id', 'published']
@@ -339,9 +334,9 @@ def add_post():
     db.commit()
     cursor.close()
 
+
     if image and allowed_file(image.filename):
         try:
-            # Create an S3 client
             s3 = boto3.client(
                 's3',
                 aws_access_key_id=s3_access_key,
@@ -350,18 +345,17 @@ def add_post():
             )
             s3.upload_fileobj(image, s3_bucket_name, image.filename)
             image_url = f"https://{s3_bucket_name}.s3.{s3_region}.amazonaws.com/{image.filename}"
-
+            print(image_url)
             insert_image_query = "INSERT INTO images (image) VALUES (%s)"
             insert_image_values = (image_url,)
             cursor = db.cursor()
             cursor.execute(insert_image_query, insert_image_values)
             image_id = cursor.lastrowid
             cursor.close()
-
             db.commit()
 
             insert_post_query = "INSERT INTO posts (title, body, image_id,user_id, publish_at) VALUES (%s, %s,%s, %s, NOW())"
-            insert_post_values = (title, body, image_id, id_record[0])
+            insert_post_values = (title, body, image_id, id_record[0][0])
             cursor = db.cursor()
             cursor.execute(insert_post_query, insert_post_values)
             db.commit()
@@ -394,7 +388,7 @@ def add_comment():
         abort(401, "Please reconnect to see posts")
 
     db = pool.get_connection()
-    get_user_id_query = "select id from session where session_id= %s"
+    get_user_id_query = "SELECT id FROM session WHERE session_id = %s"
     get_user_id_values = (session_id,)
     cursor = db.cursor()
     cursor.execute(get_user_id_query, get_user_id_values)
@@ -405,17 +399,29 @@ def add_comment():
     post_id = payload.get('post_id')
     comment = payload.get('comment')
 
-    if is_valid_post_id(post_id) and comment:
-        insert_comment_query = "INSERT INTO comments (post_id,user_id,comment ,created_at) VALUES (%s, %s,%s, NOW())"
+    if is_valid_post_id(post_id):
+        insert_comment_query = "INSERT INTO comments (post_id, user_id, comment, created_at) VALUES (%s, %s, %s, NOW())"
         insert_comment_values = (post_id, user_id[0], comment)
         cursor = db.cursor()
         cursor.execute(insert_comment_query, insert_comment_values)
         db.commit()
+
+        # Fetch the complete comment object
+        get_comment_query = "SELECT * FROM comments WHERE id = %s"
+        get_comment_values = (cursor.lastrowid,)
+        cursor.execute(get_comment_query, get_comment_values)
+        new_comment = cursor.fetchone()
+
         cursor.close()
         db.close()
-        resp = make_response(jsonify({"message": "new comment added"}))
+
+        resp = make_response(jsonify(new_comment))
         return resp
 
+    db.close()
+    resp = make_response(jsonify({"message": "Bad request"}))
+    resp.status_code = 400
+    return resp
 
 def is_valid_post_id(post_id):
     if str(post_id).isdigit():
@@ -425,7 +431,7 @@ def is_valid_post_id(post_id):
         cursor = db.cursor()
         cursor.execute(insert_post_query, insert_post_values)
         db.commit()
-        new_post_id = cursor.lastrowid
+        new_post_id = cursor.fetchone
         cursor.close()
         db.close()
         if new_post_id != None:
@@ -458,6 +464,147 @@ def get_all_comments(id):
         return jsonify(error='Invalid post ID')
 
 
+@app.route('/removecomment/<int:post_id>/<int:comment_id>', methods=['POST'])
+def remove_comment(post_id, comment_id):
+    session_id = request.cookies.get('session_id')
+    if is_session_expired(session_id) or session_id is None:
+        abort(401, "Please reconnect")
+    db = pool.get_connection()
+    query = "SELECT id FROM session WHERE session_id = %s "
+    insert_values = (session_id,)
+    cursor = db.cursor()
+    cursor.execute(query, insert_values)
+    user_id = cursor.fetchone()
+    cursor.close()
+    db.commit()
+
+    query = "SELECT post_id,user_id FROM comments WHERE id= %s AND user_id =%s "
+    cursor = db.cursor()
+    cursor.execute(query, (str(comment_id), user_id[0]))
+    post_id_and_user_id = cursor.fetchall()
+    cursor.close()
+    db.commit()
+
+    if post_id_and_user_id != [] and post_id_and_user_id[0][0] == post_id and post_id_and_user_id[0][1] == user_id[0]:
+        try:
+            delete_query = "DELETE FROM comments WHERE id = %s"
+            cursor = db.cursor()
+            cursor.execute(delete_query, (str(comment_id),))
+            cursor.close()
+            db.commit()
+            db.close()
+            resp = make_response(jsonify({"massage": "Comment removed successfully!"}))
+            return resp
+        except mysql.connector.Error as error:
+            # Handle any potential database errors
+            resp = make_response(jsonify({"massage": error}))
+            return resp
+    db.close()
+    resp = make_response(jsonify({"message": "illegal"}))
+    resp.status_code = 400
+    return resp
+
+
+@app.route('/remove_post/<int:post_id>', methods=['POST'])
+def remove_post(post_id):
+    session_id = request.cookies.get('session_id')
+    if is_session_expired(session_id) or session_id is None:
+        abort(401, "Please reconnect")
+    db = pool.get_connection()
+    query = "SELECT id FROM session WHERE session_id = %s "
+    insert_values = (session_id,)
+    cursor = db.cursor()
+    cursor.execute(query, insert_values)
+    user_id = cursor.fetchone()
+    cursor.close()
+    db.commit()
+
+    query = "SELECT user_id FROM posts WHERE id= %s"
+    cursor = db.cursor()
+    cursor.execute(query, (str(post_id),))
+    post_user_id = cursor.fetchone()
+    cursor.close()
+    db.commit()
+
+    if user_id != [] and post_user_id[0] == user_id[0]:
+        try:
+            delete_query = "DELETE FROM comments WHERE post_id = %s"
+            cursor = db.cursor()
+            cursor.execute(delete_query, (str(post_id),))
+            cursor.close()
+            db.commit()
+
+            get_image_id_query = "SELECT image_id FROM posts WHERE id =%s"
+            cursor = db.cursor()
+            cursor.execute(get_image_id_query,(str(post_id),))
+            image_id = cursor.fetchone()
+
+            delete_query = "DELETE FROM posts WHERE user_id = %s AND id= %s"
+            cursor = db.cursor()
+            cursor.execute(delete_query, (str(post_user_id[0]),str(post_id)))
+            cursor.close()
+            db.commit()
+
+            delete_query = "DELETE FROM images WHERE id = %s"
+            cursor = db.cursor()
+            cursor.execute(delete_query, (image_id[0],))
+            cursor.close()
+            db.commit()
+
+            db.close()
+            resp = make_response(jsonify({"massage": "post removed successfully!"}))
+            return resp
+
+        except mysql.connector.Error as error:
+            resp = make_response(jsonify({"massage": error}))
+            return resp
+    resp = make_response(jsonify({"message": "illegal"}))
+    resp.status_code = 400
+    return resp
+
+
+@app.route('/edit_post/<int:post_id>', methods=['POST'])
+def edit_post(post_id):
+    data = request.get_json()
+    edited_post_title = data['title']
+    edited_post_content = data['content']
+
+    session_id = request.cookies.get('session_id')
+    if is_session_expired(session_id) or session_id is None:
+        abort(401, "Please reconnect")
+    db = pool.get_connection()
+    query = "SELECT id FROM session WHERE session_id = %s "
+    insert_values = (session_id,)
+    cursor = db.cursor()
+    cursor.execute(query, insert_values)
+    user_id = cursor.fetchone()
+    cursor.close()
+    db.commit()
+
+    query = "SELECT user_id FROM posts WHERE id= %s"
+    cursor = db.cursor()
+    cursor.execute(query, (str(post_id),))
+    post_user_id = cursor.fetchone()
+    cursor.close()
+    db.commit()
+
+    if user_id != [] and post_user_id[0] == user_id[0]:
+        try:
+            update_query = "UPDATE posts SET title = %s, body= %s WHERE id = %s"
+            cursor = db.cursor()
+            cursor.execute(update_query, (edited_post_title,edited_post_content, str(post_id)))
+            cursor.close()
+            db.commit()
+            db.close()
+            resp = make_response(jsonify({"massage": "post edited successfully!"}))
+            return resp
+
+        except mysql.connector.Error as error:
+            resp = make_response(jsonify({"massage": error}))
+            return resp
+    resp = make_response(jsonify({"message": "illegal"}))
+    resp.status_code = 400
+    return resp
 
 
 if __name__ == "__main__":

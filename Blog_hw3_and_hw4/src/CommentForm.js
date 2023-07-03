@@ -9,22 +9,24 @@ const CommentForm = ({ postId, onSubmit }) => {
     comment: '',
   });
 
+  const [comments, setComments] = useState([]); // New state for comments
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/AddNewComment', commentData, {
+      const response = await axios.post('/AddNewComment', commentData, {
         withCredentials: true,
       });
 
-      console.log('New comment added:', response.data);
+      const newComment = response.data.comment;
 
       setCommentData((prevData) => ({
         ...prevData,
         comment: '',
-      }
-      ));
-      refresh();
+      }));
+      setComments((prevComments) => [...prevComments, newComment]); // Update comments state with the new comment
+      refresh()
     } catch (error) {
       console.error('Error adding new comment:', error);
     }
@@ -62,6 +64,10 @@ const CommentForm = ({ postId, onSubmit }) => {
           </Button>
         </Box>
       </form>
+      {/* Render the comments */}
+      {comments.map((comment, index) => (
+        <div key={index}>{comment}</div>
+      ))}
     </Container>
   );
 };

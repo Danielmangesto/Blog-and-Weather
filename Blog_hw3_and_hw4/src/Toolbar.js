@@ -6,15 +6,15 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function ButtonAppBar() {
   const [user, setUser] = useState(null);
+  const [isloggedout, setisloggedout] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) {
       const checkUserLogin = async () => {
-        const response = await fetch("http://127.0.0.1:5000/GetUserProfile", {
+        const response = await fetch("/GetUserProfile", {
           credentials: "include",
         });
-
         if (response.status === 200) {
           const data = await response.json();
           setUser(data.username);
@@ -29,18 +29,19 @@ export default function ButtonAppBar() {
   }, [user]);
 
   const handleLogout = async () => {
-    const response = await fetch("http://127.0.0.1:5000/Logout", {
+    const response = await fetch("/Logout", {
       method: "POST",
       credentials: "include",
     });
 
     if (response.status === 200 || response.status === 401) {
       setUser(null);
+      refresh()
       navigate("/Login");
     }
   };
 
-
+   const refresh = () => window.location.reload(true)
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Toolbar>

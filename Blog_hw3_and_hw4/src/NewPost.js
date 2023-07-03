@@ -53,11 +53,10 @@ function NewPost() {
         }
 
 
-        axios.post('http://127.0.0.1:5000/Posts', formData, {
+        axios.post('/Posts', formData, {
           withCredentials: true,
         })
             .then(response => {
-                console.log('New post added:', response.data);
                 setPostData({
                     title: '',
                     body: '',

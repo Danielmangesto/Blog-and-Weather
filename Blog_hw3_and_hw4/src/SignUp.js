@@ -14,10 +14,12 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from "axios";
 import { countries } from './countries_codes';
+import {useNavigate} from "react-router-dom";
+
 
 function SignUp() {
   const [countryCode, setCountryCode] = React.useState('ISR');
-
+  const Navigate = useNavigate()
   const handleCountryChange = (event) => {
     setCountryCode(event.target.value);
   };
@@ -36,6 +38,7 @@ function SignUp() {
     const url = "/SignUp";
     axios.post(url, requestData)
       .then((res) => {
+        Navigate('/Login')
       })
       .catch((err) => {
       });

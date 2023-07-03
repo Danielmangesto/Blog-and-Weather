@@ -19,8 +19,7 @@ export default function AccountPage() {
 
   const fetchUserProfile = async (sessionKey) => {
     try {
-      console.log('112')
-      const response = await fetch('http://127.0.0.1:5000/GetUserProfile', {
+      const response = await fetch('/GetUserProfile', {
         headers: {
           Authorization: `Bearer ${sessionKey}`,
           'Content-Type': 'application/json',
